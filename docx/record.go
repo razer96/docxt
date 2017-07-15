@@ -145,22 +145,22 @@ func (item *RecordItem) decode(decoder *xml.Decoder) error {
 func (item *RecordItem) encode(encoder *xml.Encoder) error {
 	if encoder != nil {
 		// Начало записи
-		start := xml.StartElement{Name: xml.Name{Local: item.Tag()}}
+		start := xml.StartElement{Name: xml.Name{Local: "w:" + item.Tag()}}
 		if err := encoder.EncodeToken(start); err != nil {
 			return err
 		}
 		// Параметры записи
-		if err := encoder.EncodeElement(&item.Params, xml.StartElement{Name: xml.Name{Local: "rPr"}}); err != nil {
+		if err := encoder.EncodeElement(&item.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "rPr"}}); err != nil {
 			return err
 		}
 		// Текст
-		if err := encoder.EncodeElement(&item.Text, xml.StartElement{Name: xml.Name{Local: "t"}}); err != nil {
+		if err := encoder.EncodeElement(&item.Text, xml.StartElement{Name: xml.Name{Local: "w:" + "t"}}); err != nil {
 			return err
 		}
 		// todo: Drawing
 		// <br />
 		if item.Break {
-			startBr := xml.StartElement{Name: xml.Name{Local: "br"}}
+			startBr := xml.StartElement{Name: xml.Name{Local: "w:" + "br"}}
 			if err := encoder.EncodeToken(startBr); err != nil {
 				return err
 			}
@@ -173,7 +173,7 @@ func (item *RecordItem) encode(encoder *xml.Encoder) error {
 		}
 		// Tab
 		if item.Tab {
-			startTab := xml.StartElement{Name: xml.Name{Local: "tab"}}
+			startTab := xml.StartElement{Name: xml.Name{Local: "w:" + "tab"}}
 			if err := encoder.EncodeToken(startTab); err != nil {
 				return err
 			}

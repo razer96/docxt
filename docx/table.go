@@ -390,16 +390,16 @@ func (row *TableCell) decode(decoder *xml.Decoder) error {
 func (item *TableItem) encode(encoder *xml.Encoder) error {
 	if encoder != nil {
 		// Начало таблицы
-		start := xml.StartElement{Name: xml.Name{Local: item.Tag()}}
+		start := xml.StartElement{Name: xml.Name{Local: "w:" + item.Tag()}}
 		if err := encoder.EncodeToken(start); err != nil {
 			return err
 		}
 		// Параметры таблицы
-		if err := encoder.EncodeElement(&item.Params, xml.StartElement{Name: xml.Name{Local: "tblPr"}}); err != nil {
+		if err := encoder.EncodeElement(&item.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "tblPr"}}); err != nil {
 			return err
 		}
 		// Сетка таблицы
-		if err := encoder.EncodeElement(&item.Grid, xml.StartElement{Name: xml.Name{Local: "tblGrid"}}); err != nil {
+		if err := encoder.EncodeElement(&item.Grid, xml.StartElement{Name: xml.Name{Local: "w:" + "tblGrid"}}); err != nil {
 			return err
 		}
 		// Строки таблицы
@@ -423,12 +423,12 @@ func (item *TableItem) encode(encoder *xml.Encoder) error {
 func (cell *TableCell) encode(encoder *xml.Encoder) error {
 	if encoder != nil {
 		// Начало ячейки таблицы
-		start := xml.StartElement{Name: xml.Name{Local: "tc"}}
+		start := xml.StartElement{Name: xml.Name{Local: "w:" + "tc"}}
 		if err := encoder.EncodeToken(start); err != nil {
 			return err
 		}
 		// Параметры ячейки таблицы
-		if err := encoder.EncodeElement(&cell.Params, xml.StartElement{Name: xml.Name{Local: "tcPr"}}); err != nil {
+		if err := encoder.EncodeElement(&cell.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "tcPr"}}); err != nil {
 			return err
 		}
 		// Кодируем составные элементы
@@ -450,29 +450,29 @@ func (cell *TableCell) encode(encoder *xml.Encoder) error {
 func (row *TableRow) encode(encoder *xml.Encoder) error {
 	if encoder != nil {
 		// Начало строки таблицы
-		var rsidR = xml.Attr{Name: xml.Name{Local: "rsidR"}, Value: row.RsidR}
-		var rsidTr = xml.Attr{Name: xml.Name{Local: "rsidTr"}, Value: row.RsidTr}
+		var rsidR = xml.Attr{Name: xml.Name{Local: "w:" + "rsidR"}, Value: row.RsidR}
+		var rsidTr = xml.Attr{Name: xml.Name{Local: "w:" + "rsidTr"}, Value: row.RsidTr}
 		var attrs = []xml.Attr{rsidR, rsidTr}
-		start := xml.StartElement{Name: xml.Name{Local: "tr"}, Attr: attrs}
+		start := xml.StartElement{Name: xml.Name{Local: "w:" + "tr"}, Attr: attrs}
 		if err := encoder.EncodeToken(start); err != nil {
 			return err
 		}
 		// Параметры строки таблицы
 		if row.OtherParams != nil {
-			if err := encoder.EncodeElement(row.OtherParams, xml.StartElement{Name: xml.Name{Local: "tblPrEx"}}); err != nil {
+			if err := encoder.EncodeElement(row.OtherParams, xml.StartElement{Name: xml.Name{Local: "w:" + "tblPrEx"}}); err != nil {
 				return err
 			}
 		}
 		// Кодируем Параметры
-		startPr := xml.StartElement{Name: xml.Name{Local: "trPr"}}
+		startPr := xml.StartElement{Name: xml.Name{Local: "w:" + "trPr"}}
 		if err := encoder.EncodeToken(startPr); err != nil {
 			return err
 		}
-		if err := encoder.EncodeElement(&row.Params.Height, xml.StartElement{Name: xml.Name{Local: "trHeight"}}); err != nil {
+		if err := encoder.EncodeElement(&row.Params.Height, xml.StartElement{Name: xml.Name{Local: "w:" + "trHeight"}}); err != nil {
 			return err
 		}
 		if row.Params.IsHeader {
-			startHeader := xml.StartElement{Name: xml.Name{Local: "tblHeader"}}
+			startHeader := xml.StartElement{Name: xml.Name{Local: "w:" + "tblHeader"}}
 			if err := encoder.EncodeToken(startHeader); err != nil {
 				return err
 			}

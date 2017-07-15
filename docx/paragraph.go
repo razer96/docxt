@@ -161,18 +161,18 @@ func (item *ParagraphItem) encode(encoder *xml.Encoder) error {
 		// RsidR        string `xml:"rsidR,attr,omitempty"`
 		// RsidRDefault string `xml:"rsidRDefault,attr,omitempty"`
 		// RsidP        string `xml:"rsidP,attr,omitempty"`
-		rsidR := xml.Attr{Name: xml.Name{Local: "rsidR"}, Value: item.RsidR}
-		rsidRDefault := xml.Attr{Name: xml.Name{Local: "rsidRDefault"}, Value: item.RsidRDefault}
-		rsidP := xml.Attr{Name: xml.Name{Local: "rsidP"}, Value: item.RsidP}
+		rsidR := xml.Attr{Name: xml.Name{Local: "w:" + "rsidR"}, Value: item.RsidR}
+		rsidRDefault := xml.Attr{Name: xml.Name{Local: "w:" + "rsidRDefault"}, Value: item.RsidRDefault}
+		rsidP := xml.Attr{Name: xml.Name{Local: "w:" + "rsidP"}, Value: item.RsidP}
 		// Начало параграфа
 
-		start := xml.StartElement{Name: xml.Name{Local: item.Tag()},
+		start := xml.StartElement{Name: xml.Name{Local: "w:" + item.Tag()},
 			Attr: []xml.Attr{rsidR, rsidRDefault, rsidP}}
 		if err := encoder.EncodeToken(start); err != nil {
 			return err
 		}
 		// Параметры параграфа
-		if err := encoder.EncodeElement(&item.Params, xml.StartElement{Name: xml.Name{Local: "pPr"}}); err != nil {
+		if err := encoder.EncodeElement(&item.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "pPr"}}); err != nil {
 			return err
 		}
 		// Кодируем составные элементы

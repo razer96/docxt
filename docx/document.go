@@ -167,7 +167,7 @@ func (doc *Document) Encode(writer io.Writer) error {
 		if len(doc.SkipScheme) > 0 {
 			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: "Ignorable"}, Value: doc.SkipScheme})
 		}
-		docStart := xml.StartElement{Name: xml.Name{Local: "document"}, Attr: attrs}
+		docStart := xml.StartElement{Name: xml.Name{Local: "w:document"}, Attr: attrs}
 		err := encoder.EncodeToken(docStart)
 		if err != nil {
 			return err
@@ -191,8 +191,8 @@ func (doc *Document) Encode(writer io.Writer) error {
 func (body *Body) encode(encoder *xml.Encoder) error {
 	if encoder != nil {
 		// Начало BODY
-		bodyStart := xml.StartElement{Name: xml.Name{Local: "body"}}
-		if err := encoder.EncodeToken(xml.StartElement{Name: xml.Name{Local: "body"}}); err != nil {
+		bodyStart := xml.StartElement{Name: xml.Name{Local: "w:" + "body"}}
+		if err := encoder.EncodeToken(xml.StartElement{Name: xml.Name{Local: "w:" + "body"}}); err != nil {
 			return err
 		}
 		// Переходим к элементам
@@ -202,7 +202,7 @@ func (body *Body) encode(encoder *xml.Encoder) error {
 			}
 		}
 		// Кодируем параметры
-		if err := encoder.EncodeElement(&body.Params, xml.StartElement{Name: xml.Name{Local: "sectPr"}}); err != nil {
+		if err := encoder.EncodeElement(&body.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "sectPr"}}); err != nil {
 			return err
 		}
 		// Конец BODY
