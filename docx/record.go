@@ -7,10 +7,11 @@ import (
 
 // RecordItem - record item
 type RecordItem struct {
-	Params RecordParams `xml:"rPr,omitempty"`
-	Text   string       `xml:"t,omitempty"`
-	Tab    bool         `xml:"tab,omitempty"`
-	Break  bool         `xml:"br,omitempty"`
+	Params  RecordParams `xml:"rPr,omitempty"`
+	Text    string       `xml:"t,omitempty"`
+	Tab     bool         `xml:"tab,omitempty"`
+	Break   bool         `xml:"br,omitempty"`
+	Drawing *Drawing     `xml:"drawing,omitempty"`
 }
 
 // RecordParams - params record
@@ -204,7 +205,7 @@ func (item *RecordItem) decode(decoder *xml.Decoder) error {
 					} else if element.Name.Local == "tab" {
 						item.Tab = true
 					} else if element.Name.Local == "drawing" {
-						// todo:
+						decoder.DecodeElement(&item.Drawing, &element)
 					}
 				}
 			case xml.EndElement:
@@ -239,6 +240,11 @@ func (item *RecordItem) encode(encoder *xml.Encoder) error {
 			return err
 		}
 		// todo: Drawing
+		if item.Drawing != nil {
+			if err := encoder.EncodeElement(item.Drawing.ToWDrawing(), xml.StartElement{Name: xml.Name{Local: "w:" + "drawing"}}); err != nil {
+				return err
+			}
+		}
 		// <br />
 		if item.Break {
 			startBr := xml.StartElement{Name: xml.Name{Local: "w:" + "br"}}

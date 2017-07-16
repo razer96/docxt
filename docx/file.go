@@ -7,15 +7,13 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
-	"regexp"
 	"strings"
 )
 
 var (
-	rxXMLNsVals = regexp.MustCompile("\\s(\\w+)=\"http://schemas.")
-	rxURnVals   = regexp.MustCompile("\\s(\\w+)=\"urn:")
-	emptyTags   = []string{"top", "left", "bottom", "right", "insideV", "insideH",
+	emptyTags = []string{"top", "left", "bottom", "right", "insideV", "insideH",
 		"shd", "jc", "vAlign", "vMerge", "noWrap", "docGrid",
 		"b", "bCs", "i", "u", "sz", "szCs", "color", "hideMark",
 		"tblLayout", "tblHeader", "tblInd", "tblW", "gridCol", "gridSpan",
@@ -192,6 +190,7 @@ func (f *SimpleDocxFile) Save(fileName string) error {
 }
 
 func wordHeaderToXML(h *Header) (data []byte, err error) {
+	log.Println("wow")
 	if h != nil {
 		var buffer bytes.Buffer
 		writer := bufio.NewWriter(&buffer)
@@ -199,15 +198,10 @@ func wordHeaderToXML(h *Header) (data []byte, err error) {
 		if err == nil && buffer.Len() > 0 {
 			data = buffer.Bytes()
 			buffer.Reset()
-			// Замены
-			data = bytes.Replace(data, []byte(" Ignorable="), []byte(" mc:Ignorable="), 1)
-			data = bytes.Replace(data, []byte(" id="), []byte(" r:id="), -1)
 			// Замены empty tags
 			for _, emptyTag := range emptyTags {
 				data = bytes.Replace(data, []byte("></"+emptyTag+">"), []byte(" />"), -1)
 			}
-			data = rxXMLNsVals.ReplaceAll(data, []byte(" xmlns:$1=\"http://schemas."))
-			data = rxURnVals.ReplaceAll(data, []byte(" xmlns:$1=\"urn:"))
 		}
 	}
 	return
@@ -222,14 +216,10 @@ func wordDocumentToXML(d *Document) (data []byte, err error) {
 			data = buffer.Bytes()
 			buffer.Reset()
 			// Замены
-			data = bytes.Replace(data, []byte(" Ignorable="), []byte(" mc:Ignorable="), 1)
-			data = bytes.Replace(data, []byte(" id="), []byte(" r:id="), -1)
 			// Замены empty tags
 			for _, emptyTag := range emptyTags {
 				data = bytes.Replace(data, []byte("></"+emptyTag+">"), []byte(" />"), -1)
 			}
-			data = rxXMLNsVals.ReplaceAll(data, []byte(" xmlns:$1=\"http://schemas."))
-			data = rxURnVals.ReplaceAll(data, []byte(" xmlns:$1=\"urn:"))
 		}
 	}
 	return

@@ -186,10 +186,10 @@ func (doc *Document) Encode(writer io.Writer) error {
 		// Начало документа
 		var attrs = make([]xml.Attr, 0)
 		for key, val := range doc.Scheme {
-			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: key}, Value: val})
+			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: "xmlns:" + key}, Value: val})
 		}
 		if len(doc.SkipScheme) > 0 {
-			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: "Ignorable"}, Value: doc.SkipScheme})
+			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: "mc:Ignorable"}, Value: doc.SkipScheme})
 		}
 		docStart := xml.StartElement{Name: xml.Name{Local: "w:document"}, Attr: attrs}
 		err := encoder.EncodeToken(docStart)

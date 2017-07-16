@@ -60,10 +60,10 @@ func (h *Header) Encode(writer io.Writer) error {
 		// Начало документа
 		var attrs = make([]xml.Attr, 0)
 		for key, val := range h.Scheme {
-			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: key}, Value: val})
+			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: "xmlns:" + key}, Value: val})
 		}
 		if len(h.SkipScheme) > 0 {
-			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: "Ignorable"}, Value: h.SkipScheme})
+			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: "mc:Ignorable"}, Value: h.SkipScheme})
 		}
 		hStart := xml.StartElement{Name: xml.Name{Local: "hdr"}, Attr: attrs}
 		err := encoder.EncodeToken(hStart)
