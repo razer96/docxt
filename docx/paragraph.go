@@ -12,6 +12,7 @@ type ParagraphItem struct {
 	RsidR        string `xml:"rsidR,attr,omitempty"`
 	RsidRDefault string `xml:"rsidRDefault,attr,omitempty"`
 	RsidP        string `xml:"rsidP,attr,omitempty"`
+	RsidRPr      string `xml:"rsidRPr,attr,omitempty"`
 }
 
 // ParagraphParams - параметры параграфа
@@ -20,7 +21,35 @@ type ParagraphParams struct {
 	Spacing *SpacingValue `xml:"spacing,omitempty"`
 	Jc      *StringValue  `xml:"jc,omitempty"`
 	Bidi    *IntValue     `xml:"bidi,omitempty"`
-	PBdr    *PBdrValue    `xml"pBdr,omitempty"`
+	PBdr    *PBdrValue    `xml:"pBdr,omitempty"`
+}
+
+type WParagraphParams struct {
+	Style   *WStringValue  `xml:"w:pStyle,omitempty"`
+	Spacing *WSpacingValue `xml:"w:spacing,omitempty"`
+	Jc      *WStringValue  `xml:"w:jc,omitempty"`
+	Bidi    *WIntValue     `xml:"w:bidi,omitempty"`
+	PBdr    *WPBdrValue    `xml:"w:pBdr,omitempty"`
+}
+
+func (pp *ParagraphParams) ToWParagraphParams() *WParagraphParams {
+	wp := WParagraphParams{}
+	if pp.Style != nil {
+		wp.Style = (*WStringValue)(pp.Style)
+	}
+	if pp.Spacing != nil {
+		wp.Spacing = (*WSpacingValue)(pp.Spacing)
+	}
+	if pp.Bidi != nil {
+		wp.Bidi = (*WIntValue)(pp.Bidi)
+	}
+	if pp.Jc != nil {
+		wp.Jc = (*WStringValue)(pp.Jc)
+	}
+	if pp.PBdr != nil {
+		wp.PBdr = pp.PBdr.ToWPBdrValue()
+	}
+	return &wp
 }
 
 // Tag - имя тега элемента
@@ -164,15 +193,17 @@ func (item *ParagraphItem) encode(encoder *xml.Encoder) error {
 		rsidR := xml.Attr{Name: xml.Name{Local: "w:" + "rsidR"}, Value: item.RsidR}
 		rsidRDefault := xml.Attr{Name: xml.Name{Local: "w:" + "rsidRDefault"}, Value: item.RsidRDefault}
 		rsidP := xml.Attr{Name: xml.Name{Local: "w:" + "rsidP"}, Value: item.RsidP}
+		rsidRPr := xml.Attr{Name: xml.Name{Local: "w:" + "rsidRPr"}, Value: item.RsidRPr}
 		// Начало параграфа
 
 		start := xml.StartElement{Name: xml.Name{Local: "w:" + item.Tag()},
-			Attr: []xml.Attr{rsidR, rsidRDefault, rsidP}}
+			Attr: []xml.Attr{rsidR, rsidRDefault, rsidP, rsidRPr}}
 		if err := encoder.EncodeToken(start); err != nil {
 			return err
 		}
 		// Параметры параграфа
-		if err := encoder.EncodeElement(&item.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "pPr"}}); err != nil {
+
+		if err := encoder.EncodeElement(item.Params.ToWParagraphParams(), xml.StartElement{Name: xml.Name{Local: "w:" + "pPr"}}); err != nil {
 			return err
 		}
 		// Кодируем составные элементы

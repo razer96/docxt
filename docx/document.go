@@ -48,6 +48,27 @@ type BodyParams struct {
 	Bidi            IntValue        `xml:"bidi"`
 }
 
+func (b *BodyParams) ToWBodyParams() WBodyParams {
+	wp := WBodyParams{PageSize: WSizeValue(b.PageSize),
+		PageMargin: WMarginValue(b.PageMargin),
+		Bidi:       WIntValue(b.Bidi)}
+	if b.HeaderReference != nil {
+		wp.HeaderReference = (*WReferenceValue)(b.HeaderReference)
+	}
+	if b.FooterReference != nil {
+		wp.FooterReference = (*WReferenceValue)(b.FooterReference)
+	}
+	return wp
+}
+
+type WBodyParams struct {
+	HeaderReference *WReferenceValue `xml:"w:headerReference,omitempty"`
+	FooterReference *WReferenceValue `xml:"w:footerReference,omitempty"`
+	PageSize        WSizeValue       `xml:"w:pgSz"`
+	PageMargin      WMarginValue     `xml:"w:pgMar"`
+	Bidi            WIntValue        `xml:"w:bidi"`
+}
+
 /* ДЕКОДИРОВАНИЕ */
 
 // Decode (Document) - декодирование документа
@@ -138,6 +159,9 @@ func decodeItem(element *xml.StartElement, decoder *xml.Decoder) DocItem {
 				if attr.Name.Local == "rsidP" {
 					pitem.RsidP = attr.Value
 				}
+				if attr.Name.Local == "rsidRPr" {
+					pitem.RsidRPr = attr.Value
+				}
 			}
 		} else if element.Name.Local == "r" {
 			item = new(RecordItem)
@@ -202,7 +226,7 @@ func (body *Body) encode(encoder *xml.Encoder) error {
 			}
 		}
 		// Кодируем параметры
-		if err := encoder.EncodeElement(&body.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "sectPr"}}); err != nil {
+		if err := encoder.EncodeElement(body.Params.ToWBodyParams(), xml.StartElement{Name: xml.Name{Local: "w:" + "sectPr"}}); err != nil {
 			return err
 		}
 		// Конец BODY

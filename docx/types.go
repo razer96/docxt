@@ -20,6 +20,11 @@ type WidthValue struct {
 	Type  string `xml:"type,attr,omitempty"`
 }
 
+type WWidthValue struct {
+	Value int64  `xml:"w:w,attr"`
+	Type  string `xml:"w:type,attr,omitempty"`
+}
+
 // From (WidthValue)
 func (w *WidthValue) From(w1 *WidthValue) {
 	if w1 != nil {
@@ -33,6 +38,11 @@ type SizeValue struct {
 	Width       int64  `xml:"w,attr"`
 	Height      int64  `xml:"h,attr"`
 	Orientation string `xml:"orient,attr,omitempty"`
+}
+type WSizeValue struct {
+	Width       int64  `xml:"w:w,attr"`
+	Height      int64  `xml:"w:h,attr"`
+	Orientation string `xml:"w:orient,attr,omitempty"`
 }
 
 // From (SizeValue)
@@ -48,9 +58,16 @@ func (s *SizeValue) From(s1 *SizeValue) {
 type EmptyValue struct {
 }
 
+type WEmptyValue struct {
+}
+
 // StringValue - одиночное string значение
 type StringValue struct {
 	Value string `xml:"val,attr,omitempty"`
+}
+
+type WStringValue struct {
+	Value string `xml:"w:val,attr,omitempty"`
 }
 
 // From (StringValue)
@@ -68,6 +85,10 @@ type BoolValue struct {
 // IntValue - одиночное int значение
 type IntValue struct {
 	Value int64 `xml:"val,attr"`
+}
+
+type WIntValue struct {
+	Value int64 `xml:"w:val,attr"`
 }
 
 // From (IntValue)
@@ -88,12 +109,24 @@ type ReferenceValue struct {
 	ID   string `xml:"id,attr"`
 }
 
+type WReferenceValue struct {
+	Type string `xml:"r:type,attr"`
+	ID   string `xml:"r:id,attr"`
+}
+
 // SpacingValue - spacing value
 type SpacingValue struct {
 	After    int64  `xml:"after,attr"`
 	Before   int64  `xml:"before,attr"`
 	Line     int64  `xml:"line,attr"`
 	LineRule string `xml:"lineRule,attr"`
+}
+
+type WSpacingValue struct {
+	After    int64  `xml:"w:after,attr"`
+	Before   int64  `xml:"w:before,attr"`
+	Line     int64  `xml:"w:line,attr"`
+	LineRule string `xml:"w:lineRule,attr"`
 }
 
 // From (SpacingValue)
@@ -116,6 +149,15 @@ type MarginValue struct {
 	Footer int64 `xml:"footer,attr,omitempty"`
 }
 
+type WMarginValue struct {
+	Top    int64 `xml:"w:top,attr"`
+	Left   int64 `xml:"w:left,attr"`
+	Bottom int64 `xml:"w:bottom,attr"`
+	Right  int64 `xml:"w:right,attr"`
+	Header int64 `xml:"w:header,attr,omitempty"`
+	Footer int64 `xml:"w:footer,attr,omitempty"`
+}
+
 // From (MarginValue)
 func (m *MarginValue) From(m1 *MarginValue) {
 	if m1 != nil {
@@ -136,6 +178,20 @@ type Margins struct {
 	Right  WidthValue `xml:"right"`
 }
 
+type WMargins struct {
+	Top    WWidthValue `xml:"w:top"`
+	Left   WWidthValue `xml:"w:left"`
+	Bottom WWidthValue `xml:"w:bottom"`
+	Right  WWidthValue `xml:"w:right"`
+}
+
+func (m *Margins) ToWMargins() *WMargins {
+	return &WMargins{Top: WWidthValue(m.Top),
+		Left:   WWidthValue(m.Left),
+		Bottom: WWidthValue(m.Bottom),
+		Right:  WWidthValue(m.Right)}
+}
+
 // From (Margins)
 func (m *Margins) From(m1 *Margins) {
 	if m1 != nil {
@@ -152,6 +208,11 @@ type ShadowValue struct {
 	Color string `xml:"color,attr"`
 	Fill  string `xml:"fill,attr"`
 }
+type WShadowValue struct {
+	Value string `xml:"w:val,attr"`
+	Color string `xml:"w:color,attr"`
+	Fill  string `xml:"w:fill,attr"`
+}
 
 // From (ShadowValue)
 func (s *ShadowValue) From(s1 *ShadowValue) {
@@ -164,6 +225,10 @@ func (s *ShadowValue) From(s1 *ShadowValue) {
 
 type StyleValue struct {
 	Value string `xml:"val,attr,omitempty"`
+}
+
+type WStyleValue struct {
+	Value string `xml:"w:val,attr,omitempty"`
 }
 
 func (s *StyleValue) From(s1 *StyleValue) {
@@ -180,6 +245,16 @@ type LookValue struct {
 	LastColumn  string `xml:"lastColumn,attr,omitempty"`
 	NoHBand     string `xml:"noHBand,attr,omitempty"`
 	NoVBand     string `xml:"noVBand,attr,omitempty"`
+}
+
+type WLookValue struct {
+	Value       string `xml:"w:val,attr,omitempty"`
+	FirstRow    string `xml:"w:firstRow,attr,omitempty"`
+	LastRow     string `xml:"w:lastRow,attr,omitempty"`
+	FirstColumn string `xml:"w:firstColumn,attr,omitempty"`
+	LastColumn  string `xml:"w:lastColumn,attr,omitempty"`
+	NoHBand     string `xml:"w:noHBand,attr,omitempty"`
+	NoVBand     string `xml:"w:noVBand,attr,omitempty"`
 }
 
 func (l *LookValue) From(l1 *LookValue) {
@@ -203,6 +278,24 @@ type PBdrValue struct {
 	Bar     BdrValue `xml:"bar,omitempty"`
 }
 
+func (pv *PBdrValue) ToWPBdrValue() *WPBdrValue {
+	return &WPBdrValue{Top: WBdrValue(pv.Top),
+		Left:    WBdrValue(pv.Left),
+		Bottom:  WBdrValue(pv.Bottom),
+		Right:   WBdrValue(pv.Right),
+		Between: WBdrValue(pv.Between),
+		Bar:     WBdrValue(pv.Bar)}
+}
+
+type WPBdrValue struct {
+	Top     WBdrValue `xml:"w:top,omitempty"`
+	Left    WBdrValue `xml:"w:left,omitempty"`
+	Bottom  WBdrValue `xml:"w:bottom,omitempty"`
+	Right   WBdrValue `xml:"w:right,omitempty"`
+	Between WBdrValue `xml:"w:between,omitempty"`
+	Bar     WBdrValue `xml:"w:bar,omitempty"`
+}
+
 func (pb *PBdrValue) From(pb1 *PBdrValue) {
 	if pb1 != nil {
 		pb.Top.From(&pb1.Top)
@@ -218,6 +311,13 @@ type BdrValue struct {
 	Sz    string `xml:"sz,attr,omitempty"`
 	Space string `xml:"space,attr,omitempty"`
 	Color string `xml:"color,attr,omitempty"`
+}
+
+type WBdrValue struct {
+	Value string `xml:"w:val,attr,omitempty"`
+	Sz    string `xml:"w:sz,attr,omitempty"`
+	Space string `xml:"w:space,attr,omitempty"`
+	Color string `xml:"w:color,attr,omitempty"`
 }
 
 func (b *BdrValue) From(b1 *BdrValue) {

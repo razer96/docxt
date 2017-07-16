@@ -20,11 +20,84 @@ type RecordParams struct {
 	Size      *IntValue    `xml:"sz,omitempty"`
 	SizeCs    *IntValue    `xml:"szCs,omitempty"`
 	Lang      *StringValue `xml:"lang,omitempty"`
-	Underline *StringValue `xml:"u,omitempty"`
+	Underline *ShadowValue `xml:"u,omitempty"`
 	Italic    *EmptyValue  `xml:"i,omitempty"`
 	Bold      *EmptyValue  `xml:"b,omitempty"`
 	BoldCS    *EmptyValue  `xml:"bCs,omitempty"`
 	Color     *StringValue `xml:"color,omitempty"`
+	Highlight *StyleValue  `xml:"highlight,omitempty"`
+	VertAlign *StyleValue  `xml:"vertAlign,omitempty"`
+	Strike    *EmptyValue  `xml:"strike,omitempty"`
+}
+
+func (rp *RecordParams) ToWRecordParams() *WRecordParams {
+	wrp := WRecordParams{}
+	// Fonts     *WRecordFonts `xml:"w:rFonts,omitempty"`
+	if rp.Fonts != nil {
+		wrp.Fonts = (*WRecordFonts)(rp.Fonts)
+	}
+	// Rtl       *WIntValue    `xml:"w:rtl,omitempty"`
+	if rp.Rtl != nil {
+		wrp.Rtl = (*WIntValue)(rp.Rtl)
+	}
+	// Size      *WIntValue    `xml:"w:sz,omitempty"`
+	if rp.Size != nil {
+		wrp.Size = (*WIntValue)(rp.Size)
+	}
+	// SizeCs    *WIntValue    `xml:"w:szCs,omitempty"`
+	if rp.SizeCs != nil {
+		wrp.SizeCs = (*WIntValue)(rp.SizeCs)
+	}
+	// Lang      *WStringValue `xml:"w:lang,omitempty"`
+	if rp.Lang != nil {
+		wrp.Lang = (*WStringValue)(rp.Lang)
+	}
+	// Underline *WStringValue `xml:"w:u,omitempty"`
+	if rp.Underline != nil {
+		wrp.Underline = (*WShadowValue)(rp.Underline)
+	}
+	// Italic    *WEmptyValue  `xml:"w:i,omitempty"`
+	if rp.Italic != nil {
+		wrp.Italic = (*WEmptyValue)(rp.Italic)
+	}
+	// Bold      *WEmptyValue  `xml:"w:b,omitempty"`
+	if rp.Bold != nil {
+		wrp.Bold = (*WEmptyValue)(rp.Bold)
+	}
+	// BoldCS    *WEmptyValue  `xml:"w:bCs,omitempty"`
+	if rp.BoldCS != nil {
+		wrp.BoldCS = (*WEmptyValue)(rp.BoldCS)
+	}
+	// Color     *WStringValue `xml:"w:color,omitempty"`
+	if rp.Color != nil {
+		wrp.Color = (*WStringValue)(rp.Color)
+	}
+	if rp.Highlight != nil {
+		wrp.Highlight = (*WStyleValue)(rp.Highlight)
+	}
+	if rp.VertAlign != nil {
+		wrp.VertAlign = (*WStyleValue)(rp.VertAlign)
+	}
+	if rp.Strike != nil {
+		wrp.Strike = (*WEmptyValue)(rp.Strike)
+	}
+	return &wrp
+}
+
+type WRecordParams struct {
+	Fonts     *WRecordFonts `xml:"w:rFonts,omitempty"`
+	Rtl       *WIntValue    `xml:"w:rtl,omitempty"`
+	Size      *WIntValue    `xml:"w:sz,omitempty"`
+	SizeCs    *WIntValue    `xml:"w:szCs,omitempty"`
+	Lang      *WStringValue `xml:"w:lang,omitempty"`
+	Underline *WShadowValue `xml:"w:u,omitempty"`
+	Italic    *WEmptyValue  `xml:"w:i,omitempty"`
+	Bold      *WEmptyValue  `xml:"w:b,omitempty"`
+	BoldCS    *WEmptyValue  `xml:"w:bCs,omitempty"`
+	Color     *WStringValue `xml:"w:color,omitempty"`
+	Highlight *WStyleValue  `xml:"w:highlight,omitempty"`
+	VertAlign *WStyleValue  `xml:"w:vertAlign,omitempty"`
+	Strike    *WEmptyValue  `xml:"w:strike,omitempty"`
 }
 
 // RecordFonts - fonts in record
@@ -34,6 +107,14 @@ type RecordFonts struct {
 	HandleANSI string `xml:"hAnsi,attr"`
 	EastAsia   string `xml:"eastAsia,attr"`
 	HandleInt  string `xml:"hint,attr,omitempty"`
+}
+
+type WRecordFonts struct {
+	ASCII      string `xml:"w:ascii,attr"`
+	CS         string `xml:"w:cs,attr"`
+	HandleANSI string `xml:"w:hAnsi,attr"`
+	EastAsia   string `xml:"w:eastAsia,attr"`
+	HandleInt  string `xml:"w:hint,attr,omitempty"`
 }
 
 // Tag - имя тега элемента
@@ -68,7 +149,7 @@ func (item *RecordItem) Clone() DocItem {
 		result.Params.Italic = new(EmptyValue)
 	}
 	if item.Params.Underline != nil {
-		result.Params.Underline = new(StringValue)
+		result.Params.Underline = new(ShadowValue)
 		result.Params.Underline.Value = item.Params.Underline.Value
 	}
 	if item.Params.Color != nil {
@@ -150,7 +231,7 @@ func (item *RecordItem) encode(encoder *xml.Encoder) error {
 			return err
 		}
 		// Параметры записи
-		if err := encoder.EncodeElement(&item.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "rPr"}}); err != nil {
+		if err := encoder.EncodeElement(item.Params.ToWRecordParams(), xml.StartElement{Name: xml.Name{Local: "w:" + "rPr"}}); err != nil {
 			return err
 		}
 		// Текст

@@ -13,20 +13,9 @@ import (
 )
 
 var (
-	// rxStartTags = regexp.MustCompile("<(\\w+)")
-	// rxEndTags = regexp.MustCompile("<\\/(\\w+)")
-	rxVals      = regexp.MustCompile("\\s(\\w+)=")
 	rxXMLNsVals = regexp.MustCompile("\\s(\\w+)=\"http://schemas.")
 	rxURnVals   = regexp.MustCompile("\\s(\\w+)=\"urn:")
-	needwTags   = []string{"right", "color", "szCs", "insideH", "tblLook",
-		"hAnsi", "insideV", "gridSpan", "cs", "ascii", "eastAsia", "bCs", "PBdr",
-		"bottom", "tcW", "top", "docGird", "pStyle", "rFonts", "rtl", "between",
-		"u", "noWrap", "type", "tblLayout", "tblPrEx", "vMerge", "gridCol",
-		"footerReference", "spacing", "tblInd", "tblW", "hideMark", "vAlign",
-		"tcMar", "pgSz", "jc", "lang", "sz", "b", "bar", "tblStyle", "tblBorders",
-		"i", "hint", "tc", "headerReference", "shd", "bidi", "trPr", "left",
-		"pgMar", "tcBorders"}
-	emptyTags = []string{"top", "left", "bottom", "right", "insideV", "insideH",
+	emptyTags   = []string{"top", "left", "bottom", "right", "insideV", "insideH",
 		"shd", "jc", "vAlign", "vMerge", "noWrap", "docGrid",
 		"b", "bCs", "i", "u", "sz", "szCs", "color", "hideMark",
 		"tblLayout", "tblHeader", "tblInd", "tblW", "gridCol", "gridSpan",
@@ -217,15 +206,8 @@ func wordHeaderToXML(h *Header) (data []byte, err error) {
 			for _, emptyTag := range emptyTags {
 				data = bytes.Replace(data, []byte("></"+emptyTag+">"), []byte(" />"), -1)
 			}
-			for _, needwTag := range needwTags {
-				data = bytes.Replace(data, []byte("<"+needwTag), []byte("<w:"+needwTag), -1)
-				data = bytes.Replace(data, []byte("/"+needwTag+">"), []byte("/w:"+needwTag+">"), -1)
-			}
-			//data = rxStartTags.ReplaceAll(data, []byte("<w:$1"))
-			//data = rxEndTags.ReplaceAll(data, []byte("</w:$1"))
 			data = rxXMLNsVals.ReplaceAll(data, []byte(" xmlns:$1=\"http://schemas."))
 			data = rxURnVals.ReplaceAll(data, []byte(" xmlns:$1=\"urn:"))
-			data = rxVals.ReplaceAll(data, []byte(" w:$1="))
 		}
 	}
 	return
@@ -246,15 +228,8 @@ func wordDocumentToXML(d *Document) (data []byte, err error) {
 			for _, emptyTag := range emptyTags {
 				data = bytes.Replace(data, []byte("></"+emptyTag+">"), []byte(" />"), -1)
 			}
-			for _, needwTag := range needwTags {
-				data = bytes.Replace(data, []byte("<"+needwTag), []byte("<w:"+needwTag), -1)
-				data = bytes.Replace(data, []byte("/"+needwTag+">"), []byte("/w:"+needwTag+">"), -1)
-			}
-			//data = rxStartTags.ReplaceAll(data, []byte("<w:$1"))
-			//data = rxEndTags.ReplaceAll(data, []byte("</w:$1"))
 			data = rxXMLNsVals.ReplaceAll(data, []byte(" xmlns:$1=\"http://schemas."))
 			data = rxURnVals.ReplaceAll(data, []byte(" xmlns:$1=\"urn:"))
-			data = rxVals.ReplaceAll(data, []byte(" w:$1="))
 		}
 	}
 	return

@@ -17,9 +17,25 @@ type TableGrid struct {
 	Cols []*WidthValue `xml:"gridCol,omitempty"`
 }
 
+type WTableGrid struct {
+	Cols []*WWidthValue `xml:"w:gridCol,omitempty"`
+}
+
+func (g *TableGrid) ToWGirdParams() *WTableGrid {
+	gw := WTableGrid{}
+	for _, col := range g.Cols {
+		gw.Cols = append(gw.Cols, (*WWidthValue)(col))
+	}
+	return &gw
+}
+
 // TableParamsEx - Other params table
 type TableParamsEx struct {
 	Shadow ShadowValue `xml:"shd"`
+}
+
+type WTableParamsEx struct {
+	Shadow ShadowValue `xml:"w:shd"`
 }
 
 // Tag - имя тега элемента
@@ -109,9 +125,56 @@ type TableParams struct {
 	Look    *LookValue    `xml:"tblLook,omitempty"`
 }
 
+type WTableParams struct {
+	Style   *WStyleValue   `xml:"w:tblStyle,omitempty"`
+	Width   *WWidthValue   `xml:"w:tblW,omitempty"`
+	Jc      *WStringValue  `xml:"w:jc,omitempty"`
+	Ind     *WWidthValue   `xml:"w:tblInd,omitempty"`
+	Borders *WTableBorders `xml:"w:tblBorders,omitempty"`
+	Shadow  *WShadowValue  `xml:"w:shd,omitempty"`
+	Layout  *WTableLayout  `xml:"w:tblLayout,omitempty"`
+	DocGrid *WIntValue     `xml:"w:docGrid,omitempty"`
+	Look    *WLookValue    `xml:"w:tblLook,omitempty"`
+}
+
+func (tp *TableParams) ToWTableParams() *WTableParams {
+	wtp := WTableParams{}
+	if tp.Style != nil {
+		wtp.Style = (*WStyleValue)(tp.Style)
+	}
+	if tp.Width != nil {
+		wtp.Width = (*WWidthValue)(tp.Width)
+	}
+	if tp.Jc != nil {
+		wtp.Jc = (*WStringValue)(tp.Jc)
+	}
+	if tp.Ind != nil {
+		wtp.Ind = (*WWidthValue)(tp.Ind)
+	}
+	if tp.Borders != nil {
+		wtp.Borders = tp.Borders.ToWTableBorders()
+	}
+	if tp.Shadow != nil {
+		wtp.Shadow = (*WShadowValue)(tp.Shadow)
+	}
+	if tp.Layout != nil {
+		wtp.Layout = (*WTableLayout)(tp.Layout)
+	}
+	if tp.DocGrid != nil {
+		wtp.DocGrid = (*WIntValue)(tp.DocGrid)
+	}
+	if tp.Look != nil {
+		wtp.Look = (*WLookValue)(tp.Look)
+	}
+	return &wtp
+}
+
 // TableLayout - layout params
 type TableLayout struct {
 	Type string `xml:"type,attr"`
+}
+type WTableLayout struct {
+	Type string `xml:"w:type,attr"`
 }
 
 // TableBorders in table
@@ -122,6 +185,29 @@ type TableBorders struct {
 	Right   TableBorder  `xml:"right"`
 	InsideH *TableBorder `xml:"insideH,omitempty"`
 	InsideV *TableBorder `xml:"insideV,omitempty"`
+}
+
+func (tb *TableBorders) ToWTableBorders() *WTableBorders {
+	wtb := WTableBorders{Top: WTableBorder(tb.Top),
+		Left:   WTableBorder(tb.Left),
+		Bottom: WTableBorder(tb.Bottom),
+		Right:  WTableBorder(tb.Right)}
+	if tb.InsideH != nil {
+		wtb.InsideH = (*WTableBorder)(tb.InsideH)
+	}
+	if tb.InsideV != nil {
+		wtb.InsideV = (*WTableBorder)(tb.InsideV)
+	}
+	return &wtb
+}
+
+type WTableBorders struct {
+	Top     WTableBorder  `xml:"w:top"`
+	Left    WTableBorder  `xml:"w:left"`
+	Bottom  WTableBorder  `xml:"w:bottom"`
+	Right   WTableBorder  `xml:"w:right"`
+	InsideH *WTableBorder `xml:"w:insideH,omitempty"`
+	InsideV *WTableBorder `xml:"w:insideV,omitempty"`
 }
 
 // From (TableBorders)
@@ -150,6 +236,15 @@ type TableBorder struct {
 	Space  int64  `xml:"space,attr"`
 	Shadow int64  `xml:"shadow,attr"`
 	Frame  int64  `xml:"frame,attr"`
+}
+
+type WTableBorder struct {
+	Value  string `xml:"w:val,attr"`
+	Color  string `xml:"w:color,attr"`
+	Size   int64  `xml:"w:sz,attr"`
+	Space  int64  `xml:"w:space,attr"`
+	Shadow int64  `xml:"w:shadow,attr"`
+	Frame  int64  `xml:"w:frame,attr"`
 }
 
 // From (TableBorder)
@@ -196,6 +291,56 @@ type TableCellParams struct {
 	GridSpan      *IntValue     `xml:"gridSpan,omitempty"`
 	HideMark      *EmptyValue   `xml:"hideMark,omitempty"`
 	NoWrap        *EmptyValue   `xml:"noWrap,omitempty"`
+}
+
+func (tcp *TableCellParams) toWTableCellParams() *WTableCellParams {
+	wtcp := WTableCellParams{}
+	// Width         *WidthValue   `xml:"tcW,omitempty"`
+	if tcp.Width != nil {
+		wtcp.Width = (*WWidthValue)(tcp.Width)
+	}
+	// Borders       *TableBorders `xml:"tcBorders,omitempty"`
+	if tcp.Borders != nil {
+		wtcp.Borders = tcp.Borders.ToWTableBorders()
+	}
+	// Shadow        *ShadowValue  `xml:"shd,omitempty"`
+	if tcp.Shadow != nil {
+		wtcp.Shadow = (*WShadowValue)(tcp.Shadow)
+	}
+	// Margins       *Margins      `xml:"tcMar,omitempty"`
+	if tcp.Margins != nil {
+		wtcp.Margins = tcp.Margins.ToWMargins()
+	}
+	// VerticalAlign *StringValue  `xml:"vAlign,omitempty"`
+	if tcp.VerticalAlign != nil {
+		wtcp.VerticalAlign = (*WStringValue)(tcp.VerticalAlign)
+	}
+	// VerticalMerge *StringValue  `xml:"vMerge,omitempty"`
+	if tcp.GridSpan != nil {
+		wtcp.GridSpan = (*WIntValue)(tcp.GridSpan)
+	}
+	// GridSpan      *IntValue     `xml:"gridSpan,omitempty"`
+	if tcp.HideMark != nil {
+		wtcp.HideMark = (*WEmptyValue)(tcp.HideMark)
+	}
+	// HideMark      *EmptyValue   `xml:"hideMark,omitempty"`
+	if tcp.NoWrap != nil {
+		wtcp.NoWrap = (*WEmptyValue)(tcp.NoWrap)
+	}
+	// NoWrap        *EmptyValue   `xml:"noWrap,omitempty"`
+	return &wtcp
+}
+
+type WTableCellParams struct {
+	Width         *WWidthValue   `xml:"w:tcW,omitempty"`
+	Borders       *WTableBorders `xml:"w:tcBorders,omitempty"`
+	Shadow        *WShadowValue  `xml:"w:shd,omitempty"`
+	Margins       *WMargins      `xml:"w:tcMar,omitempty"`
+	VerticalAlign *WStringValue  `xml:"w:vAlign,omitempty"`
+	VerticalMerge *WStringValue  `xml:"w:vMerge,omitempty"`
+	GridSpan      *WIntValue     `xml:"w:gridSpan,omitempty"`
+	HideMark      *WEmptyValue   `xml:"w:hideMark,omitempty"`
+	NoWrap        *WEmptyValue   `xml:"w:noWrap,omitempty"`
 }
 
 // Clone (TableCell) - клонирование ячейки
@@ -395,11 +540,11 @@ func (item *TableItem) encode(encoder *xml.Encoder) error {
 			return err
 		}
 		// Параметры таблицы
-		if err := encoder.EncodeElement(&item.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "tblPr"}}); err != nil {
+		if err := encoder.EncodeElement(item.Params.ToWTableParams(), xml.StartElement{Name: xml.Name{Local: "w:" + "tblPr"}}); err != nil {
 			return err
 		}
 		// Сетка таблицы
-		if err := encoder.EncodeElement(&item.Grid, xml.StartElement{Name: xml.Name{Local: "w:" + "tblGrid"}}); err != nil {
+		if err := encoder.EncodeElement(item.Grid.ToWGirdParams(), xml.StartElement{Name: xml.Name{Local: "w:" + "tblGrid"}}); err != nil {
 			return err
 		}
 		// Строки таблицы
@@ -428,7 +573,7 @@ func (cell *TableCell) encode(encoder *xml.Encoder) error {
 			return err
 		}
 		// Параметры ячейки таблицы
-		if err := encoder.EncodeElement(&cell.Params, xml.StartElement{Name: xml.Name{Local: "w:" + "tcPr"}}); err != nil {
+		if err := encoder.EncodeElement(cell.Params.toWTableCellParams(), xml.StartElement{Name: xml.Name{Local: "w:" + "tcPr"}}); err != nil {
 			return err
 		}
 		// Кодируем составные элементы
@@ -459,7 +604,7 @@ func (row *TableRow) encode(encoder *xml.Encoder) error {
 		}
 		// Параметры строки таблицы
 		if row.OtherParams != nil {
-			if err := encoder.EncodeElement(row.OtherParams, xml.StartElement{Name: xml.Name{Local: "w:" + "tblPrEx"}}); err != nil {
+			if err := encoder.EncodeElement((*WTableParamsEx)(row.OtherParams), xml.StartElement{Name: xml.Name{Local: "w:" + "tblPrEx"}}); err != nil {
 				return err
 			}
 		}
