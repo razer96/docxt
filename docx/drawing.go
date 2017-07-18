@@ -2,18 +2,127 @@ package docx
 
 type Drawing struct {
 	Inline *Inline `xml:"inline,omitempty"`
+	Anchor *Anchor `xml:"anchor,omitempty"`
 }
 
 type WDrawing struct {
 	Inline *WInline `xml:"wp:inline,omitempty"`
+	Anchor *WAnchor `xml:"wp:anchor,omitempty"`
 }
 
 func (d *Drawing) ToWDrawing() *WDrawing {
 	wd := WDrawing{}
 	if d.Inline != nil {
-		wd = WDrawing{Inline: d.Inline.ToWInline()}
+		wd.Inline = d.Inline.ToWInline()
+	}
+	if d.Anchor != nil {
+		wd.Anchor = d.Anchor.ToWAnchor()
 	}
 	return &wd
+}
+
+type Position struct {
+	RelativeFrom string `xml:"relativeFrom,attr,omitempty"`
+	PosOffset    string `xml:"posOffset,omitempty"`
+}
+
+type WPosition struct {
+	RelativeFrom string `xml:"relativeFrom,attr,omitempty"`
+	PosOffset    string `xml:"wp:posOffset,omitempty"`
+}
+
+type SizeRel struct {
+	RelativeFrom string `xml:"relativeFrom,attr,omitempty"`
+	PctWidth     string `xml:"pctWidth,omitempty"`
+	PctHeight    string `xml:"pctHeight,omitempty"`
+}
+
+type WSizeRel struct {
+	RelativeFrom string `xml:"relativeFrom,attr,omitempty"`
+	PctWidth     string `xml:"wp14:pctWidth,omitempty"`
+	PctHeight    string `xml:"wp14:pctHeight,omitempty"`
+}
+
+type Anchor struct {
+	DistT             string             `xml:"distT,attr,omitempty"`
+	DistB             string             `xml:"distB,attr,omitempty"`
+	DistL             string             `xml:"distL,attr,omitempty"`
+	DistR             string             `xml:"distR,attr,omitempty"`
+	SimplePosAttr     string             `xml:"simplePos,attr,omitempty"`
+	SimplePos         *XyValue           `xml:"simplePos,omitempty"`
+	RelativeHeight    string             `xml:"relativeHeight,attr,omitempty"`
+	BehindDoc         string             `xml:"behindDoc,attr,omitempty"`
+	Locked            string             `xml:"locked,attr,omitempty"`
+	LayoutInCell      string             `xml:"layoutInCell,attr,omitempty"`
+	AllowOverlap      string             `xml:"allowOverlap,attr,omitempty"`
+	PositionH         *Position          `xml:"positionH,omitempty"`
+	PositionV         *Position          `xml:"positionV,omitempty"`
+	Extent            *CxCyValue         `xml:"extent,omitempty"`
+	EffectExtent      *LtrbValue         `xml:"effectExtent,omitempty"`
+	WrapNone          *EmptyValue        `xml:"wrapNone,omitempty"`
+	DocPr             *IdNameValue       `xml:"docPr,omitempty"`
+	CNvGraphicFramePr *CNvGraphicFramePr `xml:"cNvGraphicFramePr,omitempty"`
+	Graphic           *Graphic           `xml:"graphic,omitempty"`
+	SizeRelH          *SizeRel           `xml:"sizeRelH,omitempty"`
+	SizeRelV          *SizeRel           `xml:"sizeRelV,omitempty"`
+}
+
+type WAnchor struct {
+	DistT             string              `xml:"distT,attr,omitempty"`
+	DistB             string              `xml:"distB,attr,omitempty"`
+	DistL             string              `xml:"distL,attr,omitempty"`
+	DistR             string              `xml:"distR,attr,omitempty"`
+	SimplePosAttr     string              `xml:"simplePos,attr,omitempty"`
+	RelativeHeight    string              `xml:"relativeHeight,attr,omitempty"`
+	BehindDoc         string              `xml:"behindDoc,attr,omitempty"`
+	Locked            string              `xml:"locked,attr,omitempty"`
+	LayoutInCell      string              `xml:"layoutInCell,attr,omitempty"`
+	AllowOverlap      string              `xml:"allowOverlap,attr,omitempty"`
+	SimplePos         *XyValue            `xml:"wp:simplePos,omitempty"`
+	PositionH         *WPosition          `xml:"wp:positionH,omitempty"`
+	PositionV         *WPosition          `xml:"wp:positionV,omitempty"`
+	Extent            *CxCyValue          `xml:"wp:extent,omitempty"`
+	EffectExtent      *LtrbValue          `xml:"wp:effectExtent,omitempty"`
+	WrapNone          *EmptyValue         `xml:"wp:wrapNone,omitempty"`
+	DocPr             *IdNameValue        `xml:"wp:docPr,omitempty"`
+	CNvGraphicFramePr *ACNvGraphicFramePr `xml:"wp:cNvGraphicFramePr,omitempty"`
+	Graphic           *AGraphic           `xml:"a:graphic,omitempty"`
+	SizeRelH          *WSizeRel           `xml:"wp14:sizeRelH,omitempty"`
+	SizeRelV          *WSizeRel           `xml:"wp14:sizeRelV,omitempty"`
+}
+
+func (a *Anchor) ToWAnchor() *WAnchor {
+	wa := WAnchor{DistT: a.DistT, DistB: a.DistB, DistL: a.DistL, DistR: a.DistR,
+		SimplePosAttr:  a.SimplePosAttr,
+		RelativeHeight: a.RelativeHeight,
+		BehindDoc:      a.BehindDoc,
+		Locked:         a.Locked,
+		LayoutInCell:   a.LayoutInCell,
+		AllowOverlap:   a.AllowOverlap,
+		SimplePos:      a.SimplePos,
+		WrapNone:       a.WrapNone,
+		Extent:         a.Extent,
+		EffectExtent:   a.EffectExtent,
+		DocPr:          a.DocPr}
+	if a.PositionH != nil {
+		wa.PositionH = (*WPosition)(a.PositionH)
+	}
+	if a.PositionV != nil {
+		wa.PositionV = (*WPosition)(a.PositionV)
+	}
+	if a.CNvGraphicFramePr != nil {
+		wa.CNvGraphicFramePr = a.CNvGraphicFramePr.ToACNvGraphicFramePr()
+	}
+	if a.Graphic != nil {
+		wa.Graphic = a.Graphic.ToAGraphic()
+	}
+	if a.SizeRelH != nil {
+		wa.SizeRelH = (*WSizeRel)(a.SizeRelH)
+	}
+	if a.SizeRelH != nil {
+		wa.SizeRelV = (*WSizeRel)(a.SizeRelV)
+	}
+	return &wa
 }
 
 type Inline struct {
@@ -197,13 +306,13 @@ type PicNvPicPr struct {
 }
 
 type BlipFill struct {
-	Blip    *Blip    `xml:"blip,omitempty"`
-	Stretch *Stretch `xml:"strecth,omitempty"`
+	Blip    *Blip   `xml:"blip,omitempty"`
+	Stretch Stretch `xml:"strecth,omitempty"`
 }
 
 type ABlipFill struct {
-	Blip    *ABlip    `xml:"a:blip,omitempty"`
-	Stretch *AStretch `xml:"a:strecth,omitempty"`
+	Blip    *ABlip   `xml:"a:blip,omitempty"`
+	Stretch AStretch `xml:"a:strecth,omitempty"`
 }
 
 func (b *BlipFill) ToABlipFill() *ABlipFill {
@@ -211,9 +320,7 @@ func (b *BlipFill) ToABlipFill() *ABlipFill {
 	if b.Blip != nil {
 		ab.Blip = b.Blip.ToABlip()
 	}
-	if b.Stretch != nil {
-		ab.Stretch = (*AStretch)(b.Stretch)
-	}
+	ab.Stretch = AStretch(b.Stretch)
 	return &ab
 }
 
@@ -230,16 +337,18 @@ type FillRect struct {
 
 type Blip struct {
 	Embed  string  `xml:"embed,attr,omitempty"`
+	Cstate string  `xml:"cstate,attr,omitempty"`
 	ExtLst *ExtLst `xml:"extLst,omitempty"`
 }
 
 type ABlip struct {
 	Embed  string   `xml:"r:embed,attr,omitempty"`
+	Cstate string   `xml:"cstate,attr,omitempty"`
 	ExtLst *AExtLst `xml:"a:extLst,omitempty"`
 }
 
 func (b *Blip) ToABlip() *ABlip {
-	ab := ABlip{Embed: b.Embed}
+	ab := ABlip{Embed: b.Embed, Cstate: b.Cstate}
 	if b.ExtLst != nil {
 		ab.ExtLst = b.ExtLst.ToAExtLst()
 	}

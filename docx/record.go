@@ -7,11 +7,11 @@ import (
 
 // RecordItem - record item
 type RecordItem struct {
-	Params  RecordParams `xml:"rPr,omitempty"`
-	Text    string       `xml:"t,omitempty"`
-	Tab     bool         `xml:"tab,omitempty"`
-	Break   bool         `xml:"br,omitempty"`
-	Drawing *Drawing     `xml:"drawing,omitempty"`
+	Params  *RecordParams `xml:"rPr,omitempty"`
+	Text    string        `xml:"t,omitempty"`
+	Tab     bool          `xml:"tab,omitempty"`
+	Break   bool          `xml:"br,omitempty"`
+	Drawing *Drawing      `xml:"drawing,omitempty"`
 }
 
 // RecordParams - params record
@@ -29,6 +29,7 @@ type RecordParams struct {
 	Highlight *StyleValue  `xml:"highlight,omitempty"`
 	VertAlign *StyleValue  `xml:"vertAlign,omitempty"`
 	Strike    *EmptyValue  `xml:"strike,omitempty"`
+	NoProof   *EmptyValue  `xml:"noProof,omitempty"`
 }
 
 func (rp *RecordParams) ToWRecordParams() *WRecordParams {
@@ -82,6 +83,9 @@ func (rp *RecordParams) ToWRecordParams() *WRecordParams {
 	if rp.Strike != nil {
 		wrp.Strike = (*WEmptyValue)(rp.Strike)
 	}
+	if rp.NoProof != nil {
+		wrp.NoProof = (*WEmptyValue)(rp.NoProof)
+	}
 	return &wrp
 }
 
@@ -99,6 +103,7 @@ type WRecordParams struct {
 	Highlight *WStyleValue  `xml:"w:highlight,omitempty"`
 	VertAlign *WStyleValue  `xml:"w:vertAlign,omitempty"`
 	Strike    *WEmptyValue  `xml:"w:strike,omitempty"`
+	NoProof   *WEmptyValue  `xml:"w:noProof,omitempty"`
 }
 
 // RecordFonts - fonts in record
@@ -232,8 +237,10 @@ func (item *RecordItem) encode(encoder *xml.Encoder) error {
 			return err
 		}
 		// Параметры записи
-		if err := encoder.EncodeElement(item.Params.ToWRecordParams(), xml.StartElement{Name: xml.Name{Local: "w:" + "rPr"}}); err != nil {
-			return err
+		if item.Params != nil {
+			if err := encoder.EncodeElement(item.Params.ToWRecordParams(), xml.StartElement{Name: xml.Name{Local: "w:" + "rPr"}}); err != nil {
+				return err
+			}
 		}
 		// Текст
 		if err := encoder.EncodeElement(&item.Text, xml.StartElement{Name: xml.Name{Local: "w:" + "t"}}); err != nil {
