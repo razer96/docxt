@@ -65,7 +65,7 @@ func (h *Header) Encode(writer io.Writer) error {
 		if len(h.SkipScheme) > 0 {
 			attrs = append(attrs, xml.Attr{Name: xml.Name{Local: "mc:Ignorable"}, Value: h.SkipScheme})
 		}
-		hStart := xml.StartElement{Name: xml.Name{Local: "hdr"}, Attr: attrs}
+		hStart := xml.StartElement{Name: xml.Name{Local: "w:hdr"}, Attr: attrs}
 		err := encoder.EncodeToken(hStart)
 		if err != nil {
 			return err
