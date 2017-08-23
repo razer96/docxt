@@ -393,8 +393,11 @@ func (cell *TableCell) Clone() *TableCell {
 func (row *TableRow) Clone() *TableRow {
 	result := new(TableRow)
 	result.Params = row.Params
-	result.OtherParams = new(TableParamsEx)
-	result.OtherParams.Shadow = row.OtherParams.Shadow
+	if row.OtherParams != nil {
+
+		result.OtherParams = new(TableParamsEx)
+		result.OtherParams.Shadow = row.OtherParams.Shadow
+	}
 	// Клонируем ячейки
 	result.Cells = make([]*TableCell, 0)
 	for _, cell := range row.Cells {
