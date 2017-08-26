@@ -145,9 +145,11 @@ func (item *RecordItem) Clone() DocItem {
 	result.Tab = item.Tab
 	result.Break = item.Break
 	// Клонируем параметры
-	if item.Params != nil {
-		result.Params = new(RecordParams)
+
+	if item.Params == nil {
+		return result
 	}
+	result.Params = new(RecordParams)
 	if item.Params.Bold != nil {
 		result.Params.Bold = new(EmptyValue)
 	}
