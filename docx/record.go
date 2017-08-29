@@ -32,6 +32,53 @@ type RecordParams struct {
 	NoProof   *EmptyValue  `xml:"noProof,omitempty"`
 }
 
+func (rp *RecordParams) Clone() *RecordParams {
+
+	result := new(RecordParams)
+	if rp.Bold != nil {
+		result.Bold = new(EmptyValue)
+	}
+	if rp.BoldCS != nil {
+		result.BoldCS = new(EmptyValue)
+	}
+	if rp.Italic != nil {
+		result.Italic = new(EmptyValue)
+	}
+	if rp.Underline != nil {
+		result.Underline = new(ShadowValue)
+		result.Underline.Value = rp.Underline.Value
+	}
+	if rp.Color != nil {
+		result.Color = new(StringValue)
+		result.Color.Value = rp.Color.Value
+	}
+	if rp.Lang != nil {
+		result.Lang = new(StringValue)
+		result.Lang.Value = rp.Lang.Value
+	}
+	if rp.Rtl != nil {
+		result.Rtl = new(IntValue)
+		result.Rtl.Value = rp.Rtl.Value
+	}
+	if rp.Size != nil {
+		result.Size = new(IntValue)
+		result.Size.Value = rp.Size.Value
+	}
+	if rp.SizeCs != nil {
+		result.SizeCs = new(IntValue)
+		result.SizeCs.Value = rp.SizeCs.Value
+	}
+	if rp.Fonts != nil {
+		result.Fonts = new(RecordFonts)
+		result.Fonts.ASCII = rp.Fonts.ASCII
+		result.Fonts.CS = rp.Fonts.CS
+		result.Fonts.EastAsia = rp.Fonts.EastAsia
+		result.Fonts.HandleANSI = rp.Fonts.HandleANSI
+		result.Fonts.HandleInt = rp.Fonts.HandleInt
+	}
+	return result
+}
+
 func (rp *RecordParams) ToWRecordParams() *WRecordParams {
 	wrp := WRecordParams{}
 	// Fonts     *WRecordFonts `xml:"w:rFonts,omitempty"`
@@ -149,48 +196,7 @@ func (item *RecordItem) Clone() DocItem {
 	if item.Params == nil {
 		return result
 	}
-	result.Params = new(RecordParams)
-	if item.Params.Bold != nil {
-		result.Params.Bold = new(EmptyValue)
-	}
-	if item.Params.BoldCS != nil {
-		result.Params.BoldCS = new(EmptyValue)
-	}
-	if item.Params.Italic != nil {
-		result.Params.Italic = new(EmptyValue)
-	}
-	if item.Params.Underline != nil {
-		result.Params.Underline = new(ShadowValue)
-		result.Params.Underline.Value = item.Params.Underline.Value
-	}
-	if item.Params.Color != nil {
-		result.Params.Color = new(StringValue)
-		result.Params.Color.Value = item.Params.Color.Value
-	}
-	if item.Params.Lang != nil {
-		result.Params.Lang = new(StringValue)
-		result.Params.Lang.Value = item.Params.Lang.Value
-	}
-	if item.Params.Rtl != nil {
-		result.Params.Rtl = new(IntValue)
-		result.Params.Rtl.Value = item.Params.Rtl.Value
-	}
-	if item.Params.Size != nil {
-		result.Params.Size = new(IntValue)
-		result.Params.Size.Value = item.Params.Size.Value
-	}
-	if item.Params.SizeCs != nil {
-		result.Params.SizeCs = new(IntValue)
-		result.Params.SizeCs.Value = item.Params.SizeCs.Value
-	}
-	if item.Params.Fonts != nil {
-		result.Params.Fonts = new(RecordFonts)
-		result.Params.Fonts.ASCII = item.Params.Fonts.ASCII
-		result.Params.Fonts.CS = item.Params.Fonts.CS
-		result.Params.Fonts.EastAsia = item.Params.Fonts.EastAsia
-		result.Params.Fonts.HandleANSI = item.Params.Fonts.HandleANSI
-		result.Params.Fonts.HandleInt = item.Params.Fonts.HandleInt
-	}
+	result.Params = item.Params.Clone()
 	return result
 }
 

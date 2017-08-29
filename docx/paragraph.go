@@ -17,19 +17,25 @@ type ParagraphItem struct {
 
 // ParagraphParams - параметры параграфа
 type ParagraphParams struct {
-	Style   *StringValue  `xml:"pStyle,omitempty"`
-	Spacing *SpacingValue `xml:"spacing,omitempty"`
-	Jc      *StringValue  `xml:"jc,omitempty"`
-	Bidi    *IntValue     `xml:"bidi,omitempty"`
-	PBdr    *PBdrValue    `xml:"pBdr,omitempty"`
+	Style         *StringValue  `xml:"pStyle,omitempty"`
+	Spacing       *SpacingValue `xml:"spacing,omitempty"`
+	Jc            *StringValue  `xml:"jc,omitempty"`
+	Bidi          *IntValue     `xml:"bidi,omitempty"`
+	PBdr          *PBdrValue    `xml:"pBdr,omitempty"`
+	WindowControl *StringValue  `xml:"widowControl,omitempty"`
+	Ind           *MarginValue  `xml:"ind,omitempty"`
+	Rpr           *RecordParams `xml:"rPr,omitempty"`
 }
 
 type WParagraphParams struct {
-	Style   *WStringValue  `xml:"w:pStyle,omitempty"`
-	Spacing *WSpacingValue `xml:"w:spacing,omitempty"`
-	Jc      *WStringValue  `xml:"w:jc,omitempty"`
-	Bidi    *WIntValue     `xml:"w:bidi,omitempty"`
-	PBdr    *WPBdrValue    `xml:"w:pBdr,omitempty"`
+	Style         *WStringValue  `xml:"w:pStyle,omitempty"`
+	Spacing       *WSpacingValue `xml:"w:spacing,omitempty"`
+	Jc            *WStringValue  `xml:"w:jc,omitempty"`
+	Bidi          *WIntValue     `xml:"w:bidi,omitempty"`
+	PBdr          *WPBdrValue    `xml:"w:pBdr,omitempty"`
+	WindowControl *WStringValue  `xml:"w:widowControl,omitempty"`
+	Ind           *WMarginValue  `xml:"w:ind,omitempty"`
+	Rpr           *WRecordParams `xml:"w:rPr,omitempty"`
 }
 
 func (pp *ParagraphParams) ToWParagraphParams() *WParagraphParams {
@@ -48,6 +54,15 @@ func (pp *ParagraphParams) ToWParagraphParams() *WParagraphParams {
 	}
 	if pp.PBdr != nil {
 		wp.PBdr = pp.PBdr.ToWPBdrValue()
+	}
+	if pp.WindowControl != nil {
+		wp.WindowControl = (*WStringValue)(pp.WindowControl)
+	}
+	if pp.Ind != nil {
+		wp.Ind = (*WMarginValue)(pp.Ind)
+	}
+	if pp.Rpr != nil {
+		wp.Rpr = pp.Rpr.ToWRecordParams()
 	}
 	return &wp
 }
@@ -107,6 +122,17 @@ func (item *ParagraphItem) Clone() DocItem {
 		result.Params.PBdr = new(PBdrValue)
 		result.Params.PBdr.From(item.Params.PBdr)
 	}
+	if item.Params.WindowControl != nil {
+		result.Params.WindowControl = new(StringValue)
+		result.Params.WindowControl.Value = item.Params.WindowControl.Value
+	}
+	if item.Params.Ind != nil {
+		result.Params.Ind = new(MarginValue)
+		result.Params.Ind.From(item.Params.Ind)
+	}
+	if item.Params.Rpr != nil {
+		result.Params.Rpr = item.Params.Rpr.Clone()
+	}
 	return result
 }
 
@@ -131,7 +157,14 @@ func (item *ParagraphParams) decode(decoder *xml.Decoder) error {
 						decoder.DecodeElement(&item.Jc, &element)
 					} else if element.Name.Local == "bidi" {
 						decoder.DecodeElement(&item.Bidi, &element)
+					} else if element.Name.Local == "widowControl" {
+						decoder.DecodeElement(&item.WindowControl, &element)
+					} else if element.Name.Local == "ind" {
+						decoder.DecodeElement(&item.Ind, &element)
+					} else if element.Name.Local == "rPr" {
+						decoder.DecodeElement(&item.Rpr, &element)
 					}
+
 				}
 			case xml.EndElement:
 				{

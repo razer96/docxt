@@ -141,19 +141,19 @@ func (s *SpacingValue) From(s1 *SpacingValue) {
 
 // MarginValue - margin значение
 type MarginValue struct {
-	Top    int64 `xml:"top,attr"`
-	Left   int64 `xml:"left,attr"`
-	Bottom int64 `xml:"bottom,attr"`
-	Right  int64 `xml:"right,attr"`
+	Top    int64 `xml:"top,attr,omitempty"`
+	Left   int64 `xml:"left,attr,omitempty"`
+	Bottom int64 `xml:"bottom,attr,omitempty"`
+	Right  int64 `xml:"right,attr,omitempty"`
 	Header int64 `xml:"header,attr,omitempty"`
 	Footer int64 `xml:"footer,attr,omitempty"`
 }
 
 type WMarginValue struct {
-	Top    int64 `xml:"w:top,attr"`
-	Left   int64 `xml:"w:left,attr"`
-	Bottom int64 `xml:"w:bottom,attr"`
-	Right  int64 `xml:"w:right,attr"`
+	Top    int64 `xml:"w:top,attr,omitempty"`
+	Left   int64 `xml:"w:left,attr,omitempty"`
+	Bottom int64 `xml:"w:bottom,attr,omitempty"`
+	Right  int64 `xml:"w:right,attr,omitempty"`
 	Header int64 `xml:"w:header,attr,omitempty"`
 	Footer int64 `xml:"w:footer,attr,omitempty"`
 }
