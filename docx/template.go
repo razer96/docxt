@@ -1,8 +1,8 @@
 package docx
 
 import (
-	//"fmt"
 	"errors"
+	//	"fmt"
 	"github.com/aymerick/raymond"
 	"github.com/kiennh/go-docx-templates/graph"
 	"reflect"
@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	rxTemplateItem = regexp.MustCompile(`\{\{\s*([\w|\.]+)\s*\}\}`)
+	rxTemplateItem = regexp.MustCompile(`\{\{\s*([\w|\.|$]+)\s*\}\}`)
 	rxMergeCellV   = regexp.MustCompile(`\[\s?v-merge\s?\]`)
-	rxMergeIndex   = regexp.MustCompile(`\[\s?index\s?:\s?[\d|\.|\,]+\s?\]`)
+	rxMergeIndex   = regexp.MustCompile(`\[\s?index\s?:\s?[\d|\.|\,|\$]+\s?\]`)
 	rxBrCellV      = regexp.MustCompile(`\[\s?BR\s?\]`)
 )
 
@@ -58,11 +58,20 @@ func findTemplatePatternsInParagraph(p *ParagraphItem) {
 						// Удаляем элемент
 						p.Items = append(p.Items[:index], p.Items[index+1:]...)
 						// Проверка на конец
-						if strings.Index(startItem.Text, "}}") < 0 {
+						closeIndex := strings.Index(startItem.Text, "}}")
+						if closeIndex < 0 {
 							index--
 							continue
 						}
-						//fmt.Println("Merge records = ", startItem.Text)
+						anotherOpen := strings.Index(startItem.Text[closeIndex:], "{{")
+						if anotherOpen > 0 {
+							//multiple template
+							index--
+							continue
+						}
+
+						startItem = nil
+
 					} else {
 						if strings.Index(record.Text, "{{") >= 0 {
 							startItem = record
@@ -71,7 +80,7 @@ func findTemplatePatternsInParagraph(p *ParagraphItem) {
 					}
 				}
 			}
-			startItem = nil
+			//startItem = nil
 		}
 	}
 }
@@ -144,6 +153,7 @@ func renderDocItem(item DocItem, v interface{}) error {
 				for cellIndex, cell := range elem.Rows[rowIndex].Cells {
 					if len(cell.Items) > 0 {
 						plainText := plainTextFromTableCell(cell)
+
 						// Если найден флаг соединения
 						if rxMergeCellV.MatchString(plainText) {
 							if rowIndex > 0 {
@@ -291,7 +301,7 @@ func modeTemplateText(tpl string) string {
 	//fmt.Println("Mode: ", tpl)
 	tpl = strings.Replace(tpl, "{{", "{{{", -1)
 	tpl = strings.Replace(tpl, "}}", "}}}", -1)
-	tpl = strings.Replace(tpl, ".", "_", -1)
+	tpl = strings.Replace(tpl, "$", "_", -1)
 	return strings.Replace(tpl, ":length", "_length", -1)
 }
 
@@ -300,7 +310,7 @@ func haveArrayInRow(row *TableRow, v interface{}) (interface{}, bool) {
 	if row != nil {
 		for _, cell := range row.Cells {
 			if match := rxTemplateItem.FindStringSubmatch(plainTextFromTableCell(cell)); match != nil && len(match) > 1 {
-				names := strings.Split(match[1], ".")
+				names := strings.Split(match[1], "$")
 				if len(names) > 0 {
 					t := reflect.TypeOf(v)
 					val := reflect.ValueOf(v)

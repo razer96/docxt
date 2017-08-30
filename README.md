@@ -1,3 +1,5 @@
+### Using {{Items$Column1}} for array data
+
 # DOCX templater on GoLang
 
 Simple **.docx** (MS Word XML document) template based document generator using handlebars.
