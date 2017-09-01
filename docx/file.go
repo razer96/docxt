@@ -7,7 +7,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 )
@@ -190,7 +189,6 @@ func (f *SimpleDocxFile) Save(fileName string) error {
 }
 
 func wordHeaderToXML(h *Header) (data []byte, err error) {
-	log.Println("wow")
 	if h != nil {
 		var buffer bytes.Buffer
 		writer := bufio.NewWriter(&buffer)

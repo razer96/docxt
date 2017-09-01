@@ -2,7 +2,7 @@ package docx
 
 import (
 	"errors"
-	//	"fmt"
+	//+1"fmt"
 	"github.com/aymerick/raymond"
 	"github.com/kiennh/go-docx-templates/graph"
 	"reflect"
@@ -103,7 +103,17 @@ func renderDocItem(item DocItem, v interface{}) error {
 		{
 			if len(elem.Text) > 0 {
 				if rxTemplateItem.MatchString(elem.Text) {
-					out, err := raymond.Render(modeTemplateText(elem.Text), v)
+					text := modeTemplateText(elem.Text)
+					switch v.(type) {
+					case *map[string]interface{}:
+						qoute := strings.Index(text, "{{")
+						first_ := strings.Index(text, "_")
+						if first_ > 0 {
+							text = text[:qoute+3] + text[first_+1:]
+						}
+					}
+
+					out, err := raymond.Render(text, v)
 					if err != nil {
 						return err
 					}
@@ -118,8 +128,8 @@ func renderDocItem(item DocItem, v interface{}) error {
 				row := elem.Rows[rowIndex]
 				if row != nil {
 					// Если массив
-					if obj, ok := haveArrayInRow(row, v); ok {
-						lines := objToLines(obj)
+					if obj, name, ok := haveArrayInRow(row, v); ok {
+						lines := objToLines(obj, name)
 						template := row.Clone()
 						currentRow := row
 						for _, line := range lines {
@@ -274,7 +284,7 @@ func removeTemplateFromDocItem(template *regexp.Regexp, item DocItem) {
 }
 
 // objToLines - раскладываем объект на строки
-func objToLines(v interface{}) []map[string]interface{} {
+func objToLines(v interface{}, name string) []map[string]interface{} {
 	node := new(graph.Node)
 	node.FromObject(v)
 	return node.ListMap()
@@ -306,7 +316,7 @@ func modeTemplateText(tpl string) string {
 }
 
 // haveArrayInRow - содержится ли массив в строке
-func haveArrayInRow(row *TableRow, v interface{}) (interface{}, bool) {
+func haveArrayInRow(row *TableRow, v interface{}) (interface{}, string, bool) {
 	if row != nil {
 		for _, cell := range row.Cells {
 			if match := rxTemplateItem.FindStringSubmatch(plainTextFromTableCell(cell)); match != nil && len(match) > 1 {
@@ -321,9 +331,9 @@ func haveArrayInRow(row *TableRow, v interface{}) (interface{}, bool) {
 						if t != nil {
 							if t.Kind() == reflect.Array || t.Kind() == reflect.Slice {
 								if lastVal.IsValid() {
-									return lastVal.Interface(), true
+									return lastVal.Interface(), name, true
 								}
-								return v, true
+								return val.Interface(), name, true
 							}
 						} else {
 							break
@@ -334,7 +344,7 @@ func haveArrayInRow(row *TableRow, v interface{}) (interface{}, bool) {
 			}
 		}
 	}
-	return nil, false
+	return nil, "", false
 }
 
 // Простой текс у ячейки

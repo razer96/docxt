@@ -168,28 +168,6 @@ func decodeItem(element *xml.StartElement, decoder *xml.Decoder) DocItem {
 			item = new(RecordItem)
 		} else if element.Name.Local == "tbl" {
 			item = new(TableItem)
-		} else if element.Name.Local == "bookmarkStart" {
-			item = new(BookMarkStart)
-			bm := item.(*BookMarkStart)
-			for _, attr := range element.Attr {
-				if attr.Name.Local == "id" {
-					bm.ID = attr.Value
-				}
-				if attr.Name.Local == "name" {
-					bm.Name = attr.Value
-				}
-			}
-		} else if element.Name.Local == "bookmarkEnd" {
-			item = new(BookMarkEnd)
-			bm := item.(*BookMarkEnd)
-			for _, attr := range element.Attr {
-				if attr.Name.Local == "id" {
-					bm.ID = attr.Value
-				}
-				if attr.Name.Local == "name" {
-					bm.Name = attr.Value
-				}
-			}
 		}
 		if item != nil {
 			if item.decode(decoder) == nil {
