@@ -204,14 +204,18 @@ func (m *Margins) From(m1 *Margins) {
 
 // ShadowValue - значение тени
 type ShadowValue struct {
-	Value string `xml:"val,attr"`
-	Color string `xml:"color,attr"`
-	Fill  string `xml:"fill,attr"`
+	Value          string `xml:"val,attr"`
+	Color          string `xml:"color,attr"`
+	Fill           string `xml:"fill,attr"`
+	ThemeFill      string `xml:"themeFill,attr,omitempty"`
+	ThemeFillShade string `xml:"themeFillShade,attr,omitempty"`
 }
 type WShadowValue struct {
-	Value string `xml:"w:val,attr"`
-	Color string `xml:"w:color,attr"`
-	Fill  string `xml:"w:fill,attr"`
+	Value          string `xml:"w:val,attr"`
+	Color          string `xml:"w:color,attr"`
+	Fill           string `xml:"w:fill,attr"`
+	ThemeFill      string `xml:"w:themeFill,attr,omitempty"`
+	ThemeFillShade string `xml:"w:themeFillShade,attr,omitempty"`
 }
 
 // From (ShadowValue)
@@ -220,6 +224,8 @@ func (s *ShadowValue) From(s1 *ShadowValue) {
 		s.Value = s1.Value
 		s.Color = s1.Color
 		s.Fill = s1.Fill
+		s.ThemeFill = s1.ThemeFill
+		s.ThemeFillShade = s1.ThemeFillShade
 	}
 }
 

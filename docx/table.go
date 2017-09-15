@@ -261,11 +261,11 @@ func (b *TableBorder) From(b1 *TableBorder) {
 
 // TableRow - row in table
 type TableRow struct {
-	OtherParams *TableParamsEx `xml:"tblPrEx,omitempty"`
-	Params      TableRowParams `xml:"trPr"`
-	Cells       []*TableCell   `xml:"tc,omitempty"`
-	RsidR       string         `xml:"rsidR,attr,omitempty"`
-	RsidTr      string         `xml:"rsidTr,attr,omitempty"`
+	OtherParams *TableParamsEx  `xml:"tblPrEx,omitempty"`
+	Params      *TableRowParams `xml:"trPr"`
+	Cells       []*TableCell    `xml:"tc,omitempty"`
+	RsidR       string          `xml:"rsidR,attr,omitempty"`
+	RsidTr      string          `xml:"rsidTr,attr,omitempty"`
 }
 
 // TableRowParams - row params
@@ -392,7 +392,11 @@ func (cell *TableCell) Clone() *TableCell {
 // Clone (TableRow) - клонирование строки таблицы
 func (row *TableRow) Clone() *TableRow {
 	result := new(TableRow)
-	result.Params = row.Params
+	if row.Params != nil {
+		result.Params = new(TableRowParams)
+		result.Params.IsHeader = row.Params.IsHeader
+		result.Params.Height = row.Params.Height
+	}
 	if row.OtherParams != nil {
 
 		result.OtherParams = new(TableParamsEx)
@@ -472,6 +476,7 @@ func (row *TableRow) decode(decoder *xml.Decoder) error {
 			case xml.StartElement:
 				{
 					if element.Name.Local == "trHeight" {
+						row.Params = new(TableRowParams)
 						decoder.DecodeElement(&row.Params.Height, &element)
 					} else if element.Name.Local == "tblHeader" {
 						row.Params.IsHeader = true
@@ -616,19 +621,21 @@ func (row *TableRow) encode(encoder *xml.Encoder) error {
 		if err := encoder.EncodeToken(startPr); err != nil {
 			return err
 		}
-		if err := encoder.EncodeElement(&row.Params.Height, xml.StartElement{Name: xml.Name{Local: "w:" + "trHeight"}}); err != nil {
-			return err
-		}
-		if row.Params.IsHeader {
-			startHeader := xml.StartElement{Name: xml.Name{Local: "w:" + "tblHeader"}}
-			if err := encoder.EncodeToken(startHeader); err != nil {
+		if row.Params != nil {
+			if err := encoder.EncodeElement(&row.Params.Height, xml.StartElement{Name: xml.Name{Local: "w:" + "trHeight"}}); err != nil {
 				return err
 			}
-			if err := encoder.EncodeToken(startHeader.End()); err != nil {
-				return err
-			}
-			if err := encoder.Flush(); err != nil {
-				return err
+			if row.Params.IsHeader {
+				startHeader := xml.StartElement{Name: xml.Name{Local: "w:" + "tblHeader"}}
+				if err := encoder.EncodeToken(startHeader); err != nil {
+					return err
+				}
+				if err := encoder.EncodeToken(startHeader.End()); err != nil {
+					return err
+				}
+				if err := encoder.Flush(); err != nil {
+					return err
+				}
 			}
 		}
 		if err := encoder.EncodeToken(startPr.End()); err != nil {

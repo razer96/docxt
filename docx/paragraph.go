@@ -22,7 +22,7 @@ type ParagraphParams struct {
 	Jc            *StringValue  `xml:"jc,omitempty"`
 	Bidi          *IntValue     `xml:"bidi,omitempty"`
 	PBdr          *PBdrValue    `xml:"pBdr,omitempty"`
-	WindowControl *StringValue  `xml:"widowControl,omitempty"`
+	WindowControl *StringValue  `xml:"windowControl,omitempty"`
 	Ind           *MarginValue  `xml:"ind,omitempty"`
 	Rpr           *RecordParams `xml:"rPr,omitempty"`
 }
@@ -33,7 +33,7 @@ type WParagraphParams struct {
 	Jc            *WStringValue  `xml:"w:jc,omitempty"`
 	Bidi          *WIntValue     `xml:"w:bidi,omitempty"`
 	PBdr          *WPBdrValue    `xml:"w:pBdr,omitempty"`
-	WindowControl *WStringValue  `xml:"w:widowControl,omitempty"`
+	WindowControl *WStringValue  `xml:"w:windowControl,omitempty"`
 	Ind           *WMarginValue  `xml:"w:ind,omitempty"`
 	Rpr           *WRecordParams `xml:"w:rPr,omitempty"`
 }
