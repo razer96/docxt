@@ -5,10 +5,24 @@ import (
 	"errors"
 )
 
+type Text struct {
+	Value string `xml:",chardata"`
+	Space string `xml:"space,attr,omitempty"`
+}
+
+type WText struct {
+	Value string `xml:",chardata"`
+	Space string `xml:"xml:space,attr,omitempty"`
+}
+
+func (t Text) ToWText() *WText {
+	return &WText{Value: t.Value, Space: t.Space}
+}
+
 // RecordItem - record item
 type RecordItem struct {
 	Params  *RecordParams `xml:"rPr,omitempty"`
-	Text    string        `xml:"t,omitempty"`
+	Text    Text          `xml:"t,omitempty"`
 	Tab     bool          `xml:"tab,omitempty"`
 	Break   bool          `xml:"br,omitempty"`
 	Drawing *Drawing      `xml:"drawing,omitempty"`
@@ -182,7 +196,7 @@ func (item *RecordItem) Type() DocItemType {
 
 // PlainText - текст
 func (item *RecordItem) PlainText() string {
-	return item.Text
+	return item.Text.Value
 }
 
 // Clone - клонирование
@@ -254,7 +268,7 @@ func (item *RecordItem) encode(encoder *xml.Encoder) error {
 			}
 		}
 		// Текст
-		if err := encoder.EncodeElement(&item.Text, xml.StartElement{Name: xml.Name{Local: "w:" + "t"}}); err != nil {
+		if err := encoder.EncodeElement(item.Text.ToWText(), xml.StartElement{Name: xml.Name{Local: "w:" + "t"}}); err != nil {
 			return err
 		}
 		// todo: Drawing

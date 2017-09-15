@@ -54,16 +54,16 @@ func findTemplatePatternsInParagraph(p *ParagraphItem) {
 				record := i.(*RecordItem)
 				if record != nil {
 					if startItem != nil {
-						startItem.Text += record.Text
+						startItem.Text.Value += record.Text.Value
 						// Удаляем элемент
 						p.Items = append(p.Items[:index], p.Items[index+1:]...)
 						// Проверка на конец
-						closeIndex := strings.Index(startItem.Text, "}}")
+						closeIndex := strings.Index(startItem.Text.Value, "}}")
 						if closeIndex < 0 {
 							index--
 							continue
 						}
-						anotherOpen := strings.Index(startItem.Text[closeIndex:], "{{")
+						anotherOpen := strings.Index(startItem.Text.Value[closeIndex:], "{{")
 						if anotherOpen > 0 {
 							//multiple template
 							index--
@@ -73,7 +73,7 @@ func findTemplatePatternsInParagraph(p *ParagraphItem) {
 						startItem = nil
 
 					} else {
-						if strings.Index(record.Text, "{{") >= 0 {
+						if strings.Index(record.Text.Value, "{{") >= 0 {
 							startItem = record
 							continue
 						}
@@ -101,9 +101,9 @@ func renderDocItem(item DocItem, v interface{}) error {
 	// Запись
 	case *RecordItem:
 		{
-			if len(elem.Text) > 0 {
-				if rxTemplateItem.MatchString(elem.Text) {
-					text := modeTemplateText(elem.Text)
+			if len(elem.Text.Value) > 0 {
+				if rxTemplateItem.MatchString(elem.Text.Value) {
+					text := modeTemplateText(elem.Text.Value)
 					switch v.(type) {
 					case *map[string]interface{}:
 						qoute := strings.Index(text, "{{")
@@ -117,7 +117,7 @@ func renderDocItem(item DocItem, v interface{}) error {
 					if err != nil {
 						return err
 					}
-					elem.Text = out
+					elem.Text.Value = out
 				}
 			}
 		}
@@ -211,7 +211,7 @@ func clearTextFromDocItem(item DocItem) {
 			}
 		case *RecordItem:
 			{
-				elem.Text = ""
+				elem.Text.Value = ""
 			}
 		}
 	}
@@ -277,7 +277,7 @@ func removeTemplateFromDocItem(template *regexp.Regexp, item DocItem) {
 			}
 		case *RecordItem:
 			{
-				elem.Text = template.ReplaceAllString(elem.Text, "")
+				elem.Text.Value = template.ReplaceAllString(elem.Text.Value, "")
 			}
 		}
 	}
