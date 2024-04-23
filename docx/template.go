@@ -311,7 +311,7 @@ func modeTemplateText(tpl string) string {
 	//fmt.Println("Mode: ", tpl)
 	tpl = strings.Replace(tpl, "{{", "{{{", -1)
 	tpl = strings.Replace(tpl, "}}", "}}}", -1)
-	tpl = strings.Replace(tpl, "$", "_", -1)
+	tpl = strings.Replace(tpl, ".", "_", -1)
 	return strings.Replace(tpl, ":length", "_length", -1)
 }
 
@@ -320,15 +320,15 @@ func haveArrayInRow(row *TableRow, v interface{}) (interface{}, string, bool) {
 	if row != nil {
 		for _, cell := range row.Cells {
 			if match := rxTemplateItem.FindStringSubmatch(plainTextFromTableCell(cell)); match != nil && len(match) > 1 {
-				names := strings.Split(match[1], "$")
+				names := strings.Split(match[1], ".")
 				if len(names) > 0 {
 					t := reflect.TypeOf(v)
 					val := reflect.ValueOf(v)
 					var lastVal reflect.Value
 					for _, name := range names {
 						if t.Kind() == reflect.Map {
-							t = val.Type()
 							val = val.MapIndex(reflect.ValueOf(name))
+							t = reflect.TypeOf(val.Interface())
 						} else {
 							t = findType(t, name)
 							val, _ = findValue(val, name)

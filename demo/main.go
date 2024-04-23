@@ -27,13 +27,19 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	test := new(TestStruct)
-	test.FileName = "example.docx"
-	test.Items = []TestItemStruct{
-		TestItemStruct{"1", "2", []TestItemStruct2{TestItemStruct2{"3", "4"}, TestItemStruct2{"5", "6"}}},
-		TestItemStruct{"3", "4", []TestItemStruct2{TestItemStruct2{"7", "8"}, TestItemStruct2{"9", "10"}}},
+	t := make(map[string]any)
+
+	t["Items"] = []map[string]any{
+		{"Column1": "1", "Column2": "2",
+			"SubItems": []map[string]any{
+				{"Column1": "3", "Column4": "4"},
+				{"Column1": "5", "Column4": "6"},
+			},
+		},
 	}
-	if err := template.RenderTemplate(test); err != nil {
+	t["FileName"] = "example.docx"
+
+	if err := template.RenderTemplate(t); err != nil {
 		fmt.Println(err)
 		return
 	}
