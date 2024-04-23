@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/kiennh/go-docx-templates/docx"
+	"github.com/razer96/docxt/docx"
 )
 
 // DocxTemplateFile - файл шаблонизатора

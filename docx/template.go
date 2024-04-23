@@ -4,7 +4,7 @@ import (
 	"errors"
 	//+1"fmt"
 	"github.com/aymerick/raymond"
-	"github.com/kiennh/go-docx-templates/graph"
+	"github.com/razer96/docxt/graph"
 	"reflect"
 	"regexp"
 	"strings"
@@ -326,8 +326,14 @@ func haveArrayInRow(row *TableRow, v interface{}) (interface{}, string, bool) {
 					val := reflect.ValueOf(v)
 					var lastVal reflect.Value
 					for _, name := range names {
-						t := findType(t, name)
-						val, _ := findValue(val, name)
+						if t.Kind() == reflect.Map {
+							t = val.Type()
+							val = val.MapIndex(reflect.ValueOf(name))
+						} else {
+							t = findType(t, name)
+							val, _ = findValue(val, name)
+						}
+
 						if t != nil {
 							if t.Kind() == reflect.Array || t.Kind() == reflect.Slice {
 								if lastVal.IsValid() {
@@ -371,6 +377,7 @@ func findType(t reflect.Type, name string) reflect.Type {
 			return field.Type
 		}
 	}
+
 	return nil
 }
 
